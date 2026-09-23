@@ -1,1 +1,6 @@
-<a href="https://app.daily.dev/willischou"><img src="https://api.daily.dev/devcards/v2/tzw6JiyWQmMj1Sx7ALnHl.png?type=wide&r=46n" width="652" alt="Willis Chou's Dev Card"/></a>
+![Willis Chou — software engineer, Taiwan to London](./cyberpunk-profile.gif)
+
+<p align="center">
+  <a href="https://www.willischou.com">🌐 Portfolio</a> ·
+  <a href="https://github.com/Willis0826?tab=repositories">💻 Projects</a>
+</p>
