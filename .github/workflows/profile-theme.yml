@@ -1,0 +1,67 @@
+name: Switch profile day/night
+
+on:
+  schedule:
+    - cron: "0 7,19 * * *"
+      timezone: Europe/London
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-theme
+  cancel-in-progress: false
+
+jobs:
+  switch-theme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update README image
+        run: |
+          python3 <<'PY'
+          import re
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          hour = datetime.now(ZoneInfo("Europe/London")).hour
+          image = (
+              "cyberpunk-day.gif"
+              if 7 <= hour < 19
+              else "cyberpunk-profile.gif"
+          )
+
+          if not Path(image).is_file():
+              raise SystemExit(f"Missing image: {image}")
+
+          readme = Path("README.md")
+          content, matches = re.subn(
+              r"(?<=\./)cyberpunk-(?:profile|day)\.gif",
+              image,
+              readme.read_text(),
+          )
+
+          if not matches:
+              raise SystemExit("No matching profile image found in README.md")
+
+          readme.write_text(content)
+          print(f"Selected {image}")
+          PY
+
+      - name: Commit if changed
+        run: |
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "Already showing the correct theme."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update profile day/night theme"
+          git push origin HEAD:main
