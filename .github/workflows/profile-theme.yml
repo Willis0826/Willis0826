@@ -30,19 +30,23 @@ jobs:
           from pathlib import Path
           from zoneinfo import ZoneInfo
 
-          hour = datetime.now(ZoneInfo("Europe/London")).hour
-          image = (
-              "cyberpunk-day.gif"
-              if 7 <= hour < 19
-              else "cyberpunk-profile.gif"
-          )
+          now = datetime.now(ZoneInfo("Europe/London"))
+          is_daytime = 7 <= now.hour < 19
+          is_national_day = (now.month, now.day) == (10, 10)
+
+          if is_daytime and is_national_day:
+              image = "cyberpunk-taiwan-day.gif"
+          elif is_daytime:
+              image = "cyberpunk-day.gif"
+          else:
+              image = "cyberpunk-profile.gif"
 
           if not Path(image).is_file():
               raise SystemExit(f"Missing image: {image}")
 
           readme = Path("README.md")
           content, matches = re.subn(
-              r"(?<=\./)cyberpunk-(?:profile|day)\.gif",
+              r"(?<=\./)cyberpunk-(?:profile|day|taiwan-day)\.gif",
               image,
               readme.read_text(),
           )
@@ -51,7 +55,7 @@ jobs:
               raise SystemExit("No matching profile image found in README.md")
 
           readme.write_text(content)
-          print(f"Selected {image}")
+          print(f"Selected {image} at {now.isoformat()}")
           PY
 
       - name: Commit if changed
