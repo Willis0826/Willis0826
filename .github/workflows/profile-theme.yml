@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 7,19 * * *"
       timezone: Europe/London
+    # Start Christmas on December 1; restore normal themes on January 1.
+    - cron: "0 0 1 1,12 *"
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:
@@ -16,7 +19,6 @@ concurrency:
 jobs:
   switch-theme:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,7 +36,13 @@ jobs:
           is_daytime = 7 <= now.hour < 19
           is_national_day = (now.month, now.day) == (10, 10)
 
-          if is_daytime and is_national_day:
+          if now.month == 12:
+              image = (
+                  "cyberpunk-christmas-day.gif"
+                  if is_daytime
+                  else "cyberpunk-christmas-night.gif"
+              )
+          elif is_daytime and is_national_day:
               image = "cyberpunk-taiwan-day.gif"
           elif is_daytime:
               image = "cyberpunk-day.gif"
@@ -46,14 +54,12 @@ jobs:
 
           readme = Path("README.md")
           content, matches = re.subn(
-              r"(?<=\./)cyberpunk-(?:profile|day|taiwan-day)\.gif",
+              r"(?<=\./)cyberpunk-(?:profile|day|taiwan-day|christmas-day|christmas-night)\.gif",
               image,
               readme.read_text(),
           )
-
           if not matches:
               raise SystemExit("No matching profile image found in README.md")
-
           readme.write_text(content)
           print(f"Selected {image} at {now.isoformat()}")
           PY
