@@ -7,6 +7,9 @@ on:
     # Start Christmas on December 1; restore normal themes on January 1.
     - cron: "0 0 1 1,12 *"
       timezone: Europe/London
+    # Test
+    - cron: "7,37 * * * *"
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:
